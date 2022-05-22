@@ -5,40 +5,50 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Http\Requests\UserRequest;
+use App\Models\User;
 use App\Repositories\UserRepository;
-use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 final class UserService
 {
-    public function __construct(private UserRepository $UserRepository)
-    {}
+    public const NAME = 'name';
+    public const EMAIL = 'email';
+    public const PASSWORD = 'password';
+    public const ID = 'id';
+
+    public function __construct(private UserRepository $userRepository)
+    {
+    }
 
     public function save(UserRequest $request): void
     {
-        $this->UserRepository->save([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
+        $this->userRepository->save([
+            self::NAME => $request->get(self::NAME),
+            self::EMAIL => $request->get(self::EMAIL),
+            self::PASSWORD => $request->get(self::PASSWORD),
         ]);
     }
 
-    public function GetById($id)
+    public function getById(int $id): User
     {
-        $user = $this->UserRepository->find($id);
-
-        if (null !== $user) {
-            return $user;
-        } else {
-            throw new Exception('User doesnt exist');
-        }
+        return $this->userRepository->getById($id);
     }
 
-    public function update(int $id, array $data): void
+    public function update(UserRequest $request): void
     {
-        $user = $this->GetById($id);
-        $this->UserRepository->update($id, [
-            'name' => $data['name'],
-            'email' => $data['email'],
+        $this->userRepository->update((int)$request->route(self::ID), [
+            self::NAME => $request->get(self::NAME),
+            self::EMAIL => $request->get(self::EMAIL),
         ]);
+    }
+
+    public function getAllUsers(): Collection
+    {
+        return $this->userRepository->getAll();
+    }
+
+    public function delete(int $id): void
+    {
+        $this->userRepository->delete($id);
     }
 }

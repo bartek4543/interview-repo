@@ -3,9 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [UserController::class, 'welcomePage']);
 
 Route::get('user/create', [UserController::class, 'create']);
 Route::post('user/create', [UserController::class, 'save']);

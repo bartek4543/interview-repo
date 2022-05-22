@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class AbstractRepository
@@ -15,23 +16,24 @@ abstract class AbstractRepository
         $this->model->create($data);
     }
 
-    public function getById($id): array
+    public function getById(int $id): Model
     {
-        return $this->model->where('id', $id)->get();
+        return $this->model->findOrFail($id);
     }
 
-    public function find($id)
-    {
-        return $this->model->find($id);
-    }
-
-    public function getAll()
+    public function getAll(): Collection
     {
         return $this->model->get();
     }
 
-    public function getByEmail(string $email): array
+    public function delete(int $id): void
     {
-        return $this->model->where('email', $email)->get();
+        $model = $this->getById($id);
+        $model->delete();
+    }
+
+    public function update(int $id, array $updateData): void
+    {
+        $this->model->where('id', $id)->update($updateData);
     }
 }
